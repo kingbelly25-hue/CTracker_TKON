@@ -1,6 +1,7 @@
 .app {
   flex-grow: 1;
-  padding: 24px 20px 96px; /* 하단 탭바에 안 가리게 */
+  /* 하단 탭바 + 홈 인디케이터 영역만큼 비워둔다 (단독 실행 시 화면 끝까지 차므로) */
+  padding: 24px 20px calc(96px + env(safe-area-inset-bottom, 0px));
 }
 
 .screen {
@@ -458,6 +459,8 @@
   background: var(--bg);
   border-top: 1px solid var(--border);
   box-sizing: border-box;
+  /* 홈 인디케이터에 탭이 가리지 않게 */
+  padding-bottom: env(safe-area-inset-bottom, 0px);
 }
 
 .tab {

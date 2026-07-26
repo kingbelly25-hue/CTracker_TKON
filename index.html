@@ -1,10 +1,36 @@
 <!doctype html>
-<html lang="en">
+<html lang="ko">
   <head>
     <meta charset="UTF-8" />
+    <!-- viewport-fit=cover: 홈 인디케이터가 있는 기기에서 안전영역을 CSS가 읽을 수 있게 -->
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, viewport-fit=cover"
+    />
+    <title>영어 미팅 대비</title>
+
+    <!-- 홈화면에 추가했을 때 브라우저 없이 단독 실행되게 하는 핵심 -->
+    <link rel="manifest" href="/manifest.webmanifest" />
+
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>ctracker-tkon</title>
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+
+    <!-- iOS는 매니페스트의 display를 안 읽는다. 이 두 줄이 iOS용 standalone 스위치 -->
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-title" content="영어미팅" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+
+    <meta
+      name="theme-color"
+      media="(prefers-color-scheme: light)"
+      content="#ffffff"
+    />
+    <meta
+      name="theme-color"
+      media="(prefers-color-scheme: dark)"
+      content="#16171d"
+    />
   </head>
   <body>
     <div id="root"></div>
