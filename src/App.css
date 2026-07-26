@@ -1,15 +1,58 @@
-.counter {
-  font-size: 16px;
-  padding: 5px 10px;
-  border-radius: 5px;
-  color: var(--accent);
-  background: var(--accent-bg);
-  border: 2px solid transparent;
-  transition: border-color 0.3s;
-  margin-bottom: 24px;
+.app {
+  flex-grow: 1;
+  padding: 24px 20px 96px; /* 하단 탭바에 안 가리게 */
+}
+
+.screen {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.detail-head h1 {
+  color: var(--text-h);
+}
+
+.muted {
+  color: var(--text);
+  font-size: 15px;
+}
+
+.label {
+  font-size: 14px;
+  color: var(--text);
+}
+
+/* ── 카드 ─────────────────────────────── */
+
+.card {
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 18px;
+  background: var(--bg);
+  box-sizing: border-box;
+}
+
+.meeting-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.meeting-card {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  text-align: left;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+  transition: box-shadow 0.2s, border-color 0.2s;
 
   &:hover {
     border-color: var(--accent-border);
+    box-shadow: var(--shadow);
   }
   &:focus-visible {
     outline: 2px solid var(--accent);
@@ -17,168 +60,397 @@
   }
 }
 
-.hero {
-  position: relative;
-
-  .base,
-  .framework,
-  .vite {
-    inset-inline: 0;
-    margin: 0 auto;
-  }
-
-  .base {
-    width: 170px;
-    position: relative;
-    z-index: 0;
-  }
-
-  .framework,
-  .vite {
-    position: absolute;
-  }
-
-  .framework {
-    z-index: 1;
-    top: 34px;
-    height: 28px;
-    transform: perspective(2000px) rotateZ(300deg) rotateX(44deg) rotateY(39deg)
-      scale(1.4);
-  }
-
-  .vite {
-    z-index: 0;
-    top: 107px;
-    height: 26px;
-    width: auto;
-    transform: perspective(2000px) rotateZ(300deg) rotateX(40deg) rotateY(39deg)
-      scale(0.8);
-  }
+.meeting-card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
 }
 
-#center {
+.badge {
+  font-size: 12px;
+  padding: 3px 8px;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+
+/* 연습용/실전 구분은 프라이버시 경계다 — 실전은 API로 안 나간다 (기획서 6장) */
+.badge-practice {
+  color: var(--accent);
+  background: var(--accent-bg);
+}
+.badge-live {
+  color: var(--text-h);
+  background: var(--code-bg);
+}
+
+/* ── 준비도 ───────────────────────────── */
+
+.bar {
+  height: 8px;
+  border-radius: 999px;
+  background: var(--code-bg);
+  overflow: hidden;
+}
+
+.bar-fill {
+  height: 100%;
+  border-radius: 999px;
+  background: var(--accent);
+  transition: width 0.4s ease;
+}
+
+.readiness {
   display: flex;
   flex-direction: column;
-  gap: 25px;
-  place-content: center;
-  place-items: center;
-  flex-grow: 1;
+  gap: 6px;
+}
 
-  @media (max-width: 1024px) {
-    padding: 32px 20px 24px;
-    gap: 18px;
+.readiness-number {
+  font-size: 48px;
+  line-height: 1;
+  font-weight: 600;
+  letter-spacing: -1.5px;
+  color: var(--text-h);
+  margin-bottom: 6px;
+}
+
+/* ── 복습 시작 ─────────────────────────── */
+
+.starts {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.start {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 16px 18px;
+  border-radius: 12px;
+  font: inherit;
+  cursor: pointer;
+  border: 2px solid transparent;
+  transition: border-color 0.2s, opacity 0.2s;
+
+  &:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+  &:disabled {
+    cursor: default;
+    opacity: 0.45;
   }
 }
 
-#next-steps {
-  display: flex;
-  border-top: 1px solid var(--border);
-  text-align: left;
+.start-label {
+  font-size: 17px;
+  font-weight: 500;
+}
 
-  & > div {
-    flex: 1 1 0;
-    padding: 32px;
-    @media (max-width: 1024px) {
-      padding: 24px 20px;
+.start-count {
+  font-size: 15px;
+}
+
+/* 말하기 = 강조색, 듣기 = 보조색 (화면명세 1장 근거 1) */
+.start-send {
+  color: var(--bg);
+  background: var(--accent);
+
+  &:not(:disabled):hover {
+    border-color: var(--text-h);
+  }
+}
+
+.start-receive {
+  color: var(--text-h);
+  background: var(--accent-bg);
+
+  &:not(:disabled):hover {
+    border-color: var(--accent-border);
+  }
+}
+
+/* ── 카테고리별 복습 예정 ───────────────── */
+
+.category-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+
+  li {
+    display: flex;
+    justify-content: space-between;
+    padding: 12px 18px;
+    font-size: 15px;
+    color: var(--text-h);
+
+    & + li {
+      border-top: 1px solid var(--border);
     }
   }
+}
 
-  .icon {
-    margin-bottom: 16px;
-    width: 22px;
-    height: 22px;
+.done-note {
+  text-align: center;
+  padding: 8px 0;
+}
+
+/* ── 훈련 세션 ─────────────────────────── */
+
+.session-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.trigger-card {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.trigger {
+  font-size: 20px;
+  line-height: 140%;
+  color: var(--text-h);
+}
+
+.answer-input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 14px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--bg);
+  color: var(--text-h);
+  font: inherit;
+  font-size: 17px;
+  resize: vertical;
+
+  &:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 0;
+    border-color: transparent;
+  }
+}
+
+.user-input,
+.answer-text {
+  color: var(--text-h);
+  font-size: 17px;
+  line-height: 145%;
+  margin-top: 6px;
+}
+
+.judging .user-input {
+  opacity: 0.5;
+}
+
+.judging .label::after {
+  content: '…';
+  animation: blink 1.2s steps(1) infinite;
+}
+
+@keyframes blink {
+  50% {
+    opacity: 0.2;
+  }
+}
+
+.verdict {
+  border-width: 2px;
+}
+
+.verdict-pass {
+  border-color: var(--accent-border);
+  background: var(--accent-bg);
+
+  .label {
+    color: var(--accent);
+    font-weight: 600;
+  }
+}
+
+.verdict-partial {
+  border-color: var(--border);
+  background: var(--social-bg);
+
+  .label {
+    color: var(--text-h);
+    font-weight: 600;
+  }
+}
+
+.verdict-fail {
+  background: var(--code-bg);
+
+  .label {
+    color: var(--text-h);
+    font-weight: 600;
+  }
+}
+
+/* ── 듣기 ─────────────────────────────── */
+
+.listen-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  text-align: center;
+}
+
+.play {
+  width: 100%;
+  padding: 22px 0;
+  border: 2px solid transparent;
+  border-radius: 12px;
+  background: var(--accent-bg);
+  color: var(--text-h);
+  font: inherit;
+  font-size: 20px;
+  letter-spacing: 1px;
+  cursor: pointer;
+  transition: border-color 0.2s;
+
+  &:hover:not(:disabled) {
+    border-color: var(--accent-border);
+  }
+  &:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+  &:disabled {
+    cursor: default;
+    opacity: 0.5;
+  }
+}
+
+.notice {
+  font-size: 14px;
+  line-height: 140%;
+}
+
+/* ── 성과 ─────────────────────────────── */
+
+/* 히어로 숫자는 화면당 하나. 본문과 같은 sans, 자간만 조인다.
+   tabular-nums는 안 쓴다 — 큰 숫자에서 자간이 벌어져 보인다 */
+.hero-number {
+  font-size: 56px;
+  line-height: 1;
+  font-weight: 600;
+  letter-spacing: -2px;
+  color: var(--text-h);
+  margin: 4px 0 2px;
+}
+
+.sparkline {
+  width: 100%;
+  height: auto;
+  display: block;
+  margin: 10px 0 2px;
+}
+
+.trend-value {
+  text-align: right;
+  font-size: 15px;
+  color: var(--text-h);
+}
+
+.benchmark {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.locked {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  text-align: center;
+  padding: 16px 0 8px;
+}
+
+.locked-count {
+  font-size: 40px;
+  line-height: 1;
+  font-weight: 600;
+  letter-spacing: -1.2px;
+  color: var(--text-h);
+}
+
+.compare {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+
+  audio {
+    width: 100%;
+    margin-top: 6px;
+  }
+}
+
+.back {
+  align-self: flex-start;
+  padding: 0;
+  border: none;
+  background: none;
+  font: inherit;
+  font-size: 15px;
+  color: var(--text);
+  cursor: pointer;
+
+  &:hover:not(:disabled) {
+    color: var(--accent);
+  }
+  &:disabled {
+    cursor: default;
+    opacity: 0.5;
   }
 
-  @media (max-width: 1024px) {
-    flex-direction: column;
+  &.center {
+    align-self: center;
     text-align: center;
   }
 }
 
-#docs {
-  border-right: 1px solid var(--border);
+/* ── 하단 탭바 ─────────────────────────── */
 
-  @media (max-width: 1024px) {
-    border-right: none;
-    border-bottom: 1px solid var(--border);
-  }
-}
-
-#next-steps ul {
-  list-style: none;
-  padding: 0;
+.tabbar {
+  position: fixed;
+  bottom: 0;
+  width: 480px;
+  max-width: 100%;
   display: flex;
-  gap: 8px;
-  margin: 32px 0 0;
-
-  .logo {
-    height: 18px;
-  }
-
-  a {
-    color: var(--text-h);
-    font-size: 16px;
-    border-radius: 6px;
-    background: var(--social-bg);
-    display: flex;
-    padding: 6px 12px;
-    align-items: center;
-    gap: 8px;
-    text-decoration: none;
-    transition: box-shadow 0.3s;
-
-    &:hover {
-      box-shadow: var(--shadow);
-    }
-    .button-icon {
-      height: 18px;
-      width: 18px;
-    }
-  }
-
-  @media (max-width: 1024px) {
-    margin-top: 20px;
-    flex-wrap: wrap;
-    justify-content: center;
-
-    li {
-      flex: 1 1 calc(50% - 8px);
-    }
-
-    a {
-      width: 100%;
-      justify-content: center;
-      box-sizing: border-box;
-    }
-  }
-}
-
-#spacer {
-  height: 88px;
+  background: var(--bg);
   border-top: 1px solid var(--border);
-  @media (max-width: 1024px) {
-    height: 48px;
-  }
+  box-sizing: border-box;
 }
 
-.ticks {
-  position: relative;
-  width: 100%;
+.tab {
+  flex: 1 1 0;
+  padding: 14px 0 18px;
+  border: none;
+  background: none;
+  font: inherit;
+  font-size: 14px;
+  color: var(--text);
+  cursor: pointer;
+  border-top: 2px solid transparent;
+  margin-top: -1px;
 
-  &::before,
-  &::after {
-    content: '';
-    position: absolute;
-    top: -4.5px;
-    border: 5px solid transparent;
+  &.active {
+    color: var(--accent);
+    border-top-color: var(--accent);
   }
-
-  &::before {
-    left: 0;
-    border-left-color: var(--border);
-  }
-  &::after {
-    right: 0;
-    border-right-color: var(--border);
+  &:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: -2px;
   }
 }
