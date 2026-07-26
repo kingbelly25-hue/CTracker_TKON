@@ -18,4 +18,9 @@ export default defineConfig([
       parserOptions: { ecmaFeatures: { jsx: true } },
     },
   },
+  {
+    // 서버리스 함수와 빌드 설정은 Node에서 돈다 — process, Buffer가 있다
+    files: ['api/**/*.js', '*.config.js'],
+    languageOptions: { globals: globals.node },
+  },
 ])

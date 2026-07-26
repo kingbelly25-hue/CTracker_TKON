@@ -1,0 +1,26 @@
+rules_version = '2';
+
+// Firebase 콘솔 > Firestore Database > 규칙 에 붙여넣고 게시한다.
+//
+// 계정·로그인이 없는 구조다 (기획서 7장 — CutTracker 방식).
+// 연결 코드가 곧 열쇠이므로, 규칙이 막을 수 있는 건 두 가지뿐이다:
+//   1) 6자리 코드 형식이 아닌 문서 — 무작위 문서로 저장소를 채우는 장난 차단
+//   2) 정해진 필드 외의 데이터 — 특히 녹음(base64)이 올라가는 것
+// 코드를 아는 사람은 그 기록을 읽고 쓸 수 있다. 이 한계는 알고 지고 간다.
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    match /sync/{code} {
+      allow read: if code.matches('^[A-Z0-9]{6}$');
+
+      allow write: if code.matches('^[A-Z0-9]{6}$')
+                   && request.resource.data.keys()
+                        .hasOnly(['records', 'history', 'flags', 'updatedAt']);
+    }
+
+    // 그 외 모든 경로 차단 (같은 프로젝트의 다른 앱이 Firestore를 쓰게 되면 여기에 추가)
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

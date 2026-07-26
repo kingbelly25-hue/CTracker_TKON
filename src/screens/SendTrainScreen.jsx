@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { BLOCK_CATEGORIES, blocksOf } from '../data/content'
 import { dueIds, getRecord, grade } from '../lib/srs'
-import { hasApiKey, judgeSend, JUDGE_TIMEOUT_MS } from '../lib/gemini'
+import { judgeSend, JUDGE_TIMEOUT_MS } from '../lib/gemini'
 
 // 송신 훈련 화면 (화면명세 2장)
 // 한글 트리거 → 영어 인출 → 판정 → SRS 갱신.
@@ -93,12 +93,6 @@ export default function SendTrainScreen({
   const submit = async () => {
     if (!input.trim()) return
 
-    // 키가 없으면 판정을 못 한다 → 정답을 보여주고 스스로 표시하게 한다 (임시 모드)
-    if (!hasApiKey) {
-      setPhase('result')
-      return
-    }
-
     setPhase('judging')
     setError(null)
     setShowSkip(false)
@@ -173,16 +167,8 @@ export default function SendTrainScreen({
             disabled={!input.trim()}
             onClick={submit}
           >
-            <span className="start-label">
-              {hasApiKey ? '판정 받기' : '정답 보기'}
-            </span>
+            <span className="start-label">판정 받기</span>
           </button>
-          {!hasApiKey && (
-            <p className="muted notice">
-              API 키가 없어 자동 판정이 꺼져 있습니다. 정답을 보고 직접 표시하는 임시
-              모드입니다.
-            </p>
-          )}
         </>
       )}
 
@@ -251,46 +237,14 @@ export default function SendTrainScreen({
             <p className="answer-text">{current.answer}</p>
           </div>
 
-          {/* 키가 없을 때만 자가 표시. 있으면 LLM 판정이 SRS를 굴린다 */}
-          {!hasApiKey ? (
-            <div className="starts">
-              <button
-                type="button"
-                className="start start-send"
-                onClick={() => {
-                  applyResult('pass')
-                  next()
-                }}
-              >
-                <span className="start-label">기억해냈다</span>
-              </button>
-              <button
-                type="button"
-                className="start start-receive"
-                onClick={() => {
-                  applyResult('fail')
-                  next()
-                }}
-              >
-                <span className="start-label">못 했다</span>
-              </button>
-            </div>
-          ) : (
-            <>
-              <button type="button" className="start start-send" onClick={next}>
-                <span className="start-label">다음</span>
-              </button>
-              {/* 판정 오류 사례 기록용. 즉시 재판정 기능이 아니다 (화면명세 2장) */}
-              <button
-                type="button"
-                className="back center"
-                onClick={flag}
-                disabled={flagged}
-              >
-                {flagged ? '기록했습니다' : '이 판정이 이상한가요?'}
-              </button>
-            </>
-          )}
+          <button type="button" className="start start-send" onClick={next}>
+            <span className="start-label">다음</span>
+          </button>
+
+          {/* 판정 오류 사례 기록용. 즉시 재판정 기능이 아니다 (화면명세 2장) */}
+          <button type="button" className="back center" onClick={flag} disabled={flagged}>
+            {flagged ? '기록했습니다' : '이 판정이 이상한가요?'}
+          </button>
         </>
       )}
     </section>

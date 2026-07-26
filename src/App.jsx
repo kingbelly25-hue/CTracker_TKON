@@ -1,12 +1,14 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import MeetingScreen from './screens/MeetingScreen'
 import SendTrainScreen from './screens/SendTrainScreen'
 import ReceiveTrainScreen from './screens/ReceiveTrainScreen'
 import ProgressScreen from './screens/ProgressScreen'
+import SettingsScreen from './screens/SettingsScreen'
 import { MEETINGS, blocksOf, questionsOf } from './data/content'
 import { loadState, saveState } from './lib/storage'
 import { readiness } from './lib/srs'
 import { dayKey } from './lib/day'
+import { getCode, isConfigured, mergeState, pull, push } from './lib/sync'
 import './App.css'
 
 // 준비도%는 미팅의 모든 블록·질문을 한 덩어리로 본다 (기획서 5장 ② — 단일 숫자)
@@ -19,16 +21,62 @@ const TABS = [
   { id: 'send', label: '말하기' },
   { id: 'receive', label: '듣기' },
   { id: 'progress', label: '성과' },
+  { id: 'settings', label: '설정' },
 ]
+
+// 훈련 도중 매 판정마다 올리면 쓰기 요금만 늘어난다. 잠잠해지면 한 번 올린다.
+const PUSH_DELAY_MS = 3000
 
 function App() {
   const [screen, setScreen] = useState('meeting')
   const [activeMeetingId, setActiveMeetingId] = useState(null)
   const [state, setState] = useState(loadState)
+  const [syncStatus, setSyncStatus] = useState(
+    isConfigured ? '아직 동기화하지 않았습니다.' : '동기화 꺼짐 (로컬 저장만)',
+  )
+  // 동기화 콜백이 최신 상태를 읽으려면 필요하다. 렌더 중에는 건드리지 않는다.
+  const stateRef = useRef(state)
+  useEffect(() => {
+    stateRef.current = state
+  }, [state])
 
   useEffect(() => {
     saveState(state)
   }, [state])
+
+  const syncNow = useCallback(async () => {
+    const code = getCode()
+    if (!isConfigured || !code) return
+    setSyncStatus('동기화 중…')
+    try {
+      // 올리기 전에 먼저 받아 합친다 — 다른 기기 진도를 덮어쓰지 않게
+      const merged = mergeState(stateRef.current, await pull(code))
+      setState(merged)
+      await push(code, merged)
+      setSyncStatus(`${new Date().toLocaleTimeString('ko-KR')} 동기화됨`)
+    } catch (e) {
+      setSyncStatus(`동기화 실패: ${e.message}`)
+    }
+  }, [])
+
+  // 앱을 열 때 한 번 맞춘다. 첫 렌더를 막지 않게 커밋 뒤로 미룬다.
+  useEffect(() => {
+    if (!isConfigured || !getCode()) return undefined
+    const timer = setTimeout(syncNow, 0)
+    return () => clearTimeout(timer)
+  }, [syncNow])
+
+  // 기록이 바뀌면 잠잠해진 뒤 한 번만 올린다
+  useEffect(() => {
+    const code = getCode()
+    if (!isConfigured || !code) return undefined
+    const timer = setTimeout(() => {
+      push(code, stateRef.current)
+        .then(() => setSyncStatus(`${new Date().toLocaleTimeString('ko-KR')} 저장됨`))
+        .catch((e) => setSyncStatus(`올리기 실패: ${e.message}`))
+    }, PUSH_DELAY_MS)
+    return () => clearTimeout(timer)
+  }, [state.records, state.history, state.flags])
 
   // 훈련 화면이 판정 결과로 SRS 레코드를 갱신하는 통로.
   // 모든 판정이 여기로 모이므로, 성과 화면이 쓸 일별 기록도 같이 남긴다.
@@ -110,6 +158,9 @@ function App() {
             state={state}
             onSaveRecording={saveRecording}
           />
+        )}
+        {screen === 'settings' && (
+          <SettingsScreen syncStatus={syncStatus} onSyncNow={syncNow} />
         )}
       </main>
 

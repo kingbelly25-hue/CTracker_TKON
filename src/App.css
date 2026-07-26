@@ -396,6 +396,33 @@
   }
 }
 
+/* ── 설정 ─────────────────────────────── */
+
+.settings-block {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.sync-code {
+  font-family: var(--mono);
+  font-size: 32px;
+  letter-spacing: 6px;
+  font-weight: 600;
+  color: var(--text-h);
+  text-align: center;
+  padding: 12px 0;
+  background: var(--code-bg);
+  border-radius: 12px;
+}
+
+.code-input {
+  font-family: var(--mono);
+  letter-spacing: 4px;
+  text-align: center;
+  text-transform: uppercase;
+}
+
 .back {
   align-self: flex-start;
   padding: 0;

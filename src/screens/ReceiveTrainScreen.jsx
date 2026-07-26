@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState } from 'react'
 import { questionsOf } from '../data/content'
 import { dueIds, getRecord, grade } from '../lib/srs'
-import { hasApiKey, judgeReceive, JUDGE_TIMEOUT_MS } from '../lib/gemini'
-import { canSpeakLocally, getAudioUrl, hasTts, speakLocally, stopLocalSpeech } from '../lib/tts'
+import { judgeReceive, JUDGE_TIMEOUT_MS } from '../lib/gemini'
+import { canSpeakLocally, getAudioUrl, speakLocally, stopLocalSpeech } from '../lib/tts'
 
 // 수신 훈련 화면 (화면명세 3장)
 // 음원 듣기 → 요지 한 줄 → 3단계 판정 → 원문 공개.
@@ -48,7 +48,7 @@ export default function ReceiveTrainScreen({
   const [showSkip, setShowSkip] = useState(false)
 
   const [audioUrl, setAudioUrl] = useState(null)
-  const [audioState, setAudioState] = useState(hasTts ? 'loading' : 'local')
+  const [audioState, setAudioState] = useState('loading')
   const [ttsError, setTtsError] = useState(null)
 
   const audioRef = useRef(null)
@@ -58,7 +58,7 @@ export default function ReceiveTrainScreen({
 
   // 음원은 질문이 바뀔 때 한 번만 만든다. 이후 재생은 캐시에서 — 다시 듣기는 무제한이다.
   useEffect(() => {
-    if (!current || !hasTts) return undefined
+    if (!current) return undefined
 
     let cancelled = false
     const controller = new AbortController()
@@ -132,7 +132,7 @@ export default function ReceiveTrainScreen({
     setError(null)
     setShowSkip(false)
     setAudioUrl(null)
-    setAudioState(hasTts ? 'loading' : 'local')
+    setAudioState('loading')
     setTtsError(null)
     setPhase('listen')
   }
@@ -140,11 +140,6 @@ export default function ReceiveTrainScreen({
   const submit = async () => {
     if (!input.trim()) return
     stopLocalSpeech()
-
-    if (!hasApiKey) {
-      setPhase('result')
-      return
-    }
 
     setPhase('judging')
     setError(null)
@@ -212,9 +207,8 @@ export default function ReceiveTrainScreen({
 
           {audioState === 'local' && (
             <p className="muted notice">
-              {ttsError
-                ? `Gemini 음원 생성 실패 — 브라우저 내장 음성으로 재생합니다. (${ttsError})`
-                : 'API 키가 없어 브라우저 내장 음성으로 재생합니다.'}
+              음원 생성 실패 — 브라우저 내장 음성으로 재생합니다.
+              {ttsError ? ` (${ttsError})` : ''}
               {!canSpeakLocally && ' 이 브라우저는 내장 음성도 지원하지 않습니다.'}
             </p>
           )}
@@ -236,7 +230,7 @@ export default function ReceiveTrainScreen({
             disabled={!input.trim()}
             onClick={submit}
           >
-            <span className="start-label">{hasApiKey ? '판정 받기' : '원문 보기'}</span>
+            <span className="start-label">판정 받기</span>
           </button>
         </>
       )}
@@ -296,27 +290,9 @@ export default function ReceiveTrainScreen({
             <p className="muted">{current.gist}</p>
           </div>
 
-          {!hasApiKey ? (
-            <div className="starts">
-              {['pass', 'partial', 'fail'].map((result) => (
-                <button
-                  key={result}
-                  type="button"
-                  className={result === 'pass' ? 'start start-send' : 'start start-receive'}
-                  onClick={() => {
-                    applyResult(result)
-                    next()
-                  }}
-                >
-                  <span className="start-label">{RESULT_LABEL[result]}</span>
-                </button>
-              ))}
-            </div>
-          ) : (
-            <button type="button" className="start start-receive" onClick={next}>
-              <span className="start-label">다음</span>
-            </button>
-          )}
+          <button type="button" className="start start-receive" onClick={next}>
+            <span className="start-label">다음</span>
+          </button>
         </>
       )}
     </section>
